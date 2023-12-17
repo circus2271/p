@@ -37,7 +37,10 @@ class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
 			super().do_GET()
 			return
 
-
+		if current_url == '':
+			page = 'homepage'
+		else:
+			page = current_url
 
 		self.send_response(200)
 		self.send_header('Content-type','text/html')#'text/plain')
@@ -45,6 +48,14 @@ class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
 
 		self.wfile.write('<link rel="stylesheet" href="style.css">'.encode('utf-8'))
 		self.wfile.write(nav(current_url).encode('utf-8'))
+
+		with open(f'./particles/{page}.html') as p:
+			self.wfile.write(p.read().encode('utf-8'))
+
+		with open(f'./particles/footer.html') as f:
+			self.wfile.write(f.read().encode('utf-8'))
+
+
 		self.wfile.write('wow'.encode('utf-8'))
 		return
 
