@@ -7,3 +7,8 @@ background: green;
 a {
 color: #fff;
 }
+
+a.active {
+/*  color: green;*/
+  font-size: 2rem;
+}
