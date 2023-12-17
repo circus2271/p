@@ -14,12 +14,13 @@ pages = ['', 'about', 'homepage', 'contacts']
 
 
 def nav(current_url):
-	html = '<nav><ul>'
+	parts = ['<nav><ul>']
 	for page in pages:
 		is_active = 'active' if page == current_url else ''
 		li = f'<li><a href="/{page}" class="{is_active}">{page}</a></li>'
-		html += li
-	html += '</ul></nav>'
+		parts.append(li)
+	parts.append('</ul></nav>')
+	html = ''.join(parts)
 	return html
 
 
