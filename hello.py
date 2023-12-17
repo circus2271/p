@@ -23,6 +23,10 @@ def nav(current_url):
 	html = ''.join(parts)
 	return html
 
+cache = {}
+
+with open(f'./particles/footer.html') as f:
+	cache['footer'] = f.read()
 
 class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
 
@@ -49,11 +53,16 @@ class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
 		self.wfile.write('<link rel="stylesheet" href="style.css">'.encode('utf-8'))
 		self.wfile.write(nav(current_url).encode('utf-8'))
 
-		with open(f'./particles/{page}.html') as p:
-			self.wfile.write(p.read().encode('utf-8'))
+		if page in cache:
+			particle = cache[page]
+		else:
+			with open(f'./particles/{page}.html') as p:
+				particle = p.read()
+				cache[page] = particle
+		self.wfile.write(particle.encode('utf-8'))
 
-		with open(f'./particles/footer.html') as f:
-			self.wfile.write(f.read().encode('utf-8'))
+		footer = cache['footer']
+		self.wfile.write(footer.encode('utf-8'))
 
 
 		self.wfile.write('wow'.encode('utf-8'))
