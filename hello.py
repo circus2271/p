@@ -10,7 +10,7 @@ f = f'hello {name}'
 
 print('hello from python script')
 
-pages = ['', 'about', 'homepage', 'contacts']
+pages = ['', 'about', 'homepage', 'contacts', 'no_template']
 
 
 def nav(current_url):
@@ -28,6 +28,9 @@ cache = {}
 with open(f'./particles/footer.html') as f:
 	cache['footer'] = f.read()
 
+class TemplateNotFoundError(FileNotFoundError):
+	pass
+
 class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
 
 	def do_GET(self):
@@ -36,8 +39,6 @@ class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
 		# if True:
 		
 		if current_url not in pages:
-
-		#if self.path.endswith('.css'):
 			super().do_GET()
 			return
 
@@ -46,19 +47,24 @@ class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
 		else:
 			page = current_url
 
+		if page in cache:
+			particle = cache[page]
+		else:
+			try:
+				with open(f'./particles/{page}.html') as p:
+					particle = p.read()
+					cache[page] = particle
+			except FileNotFoundError:
+				self.send_error(404, message='Template not found', explain=f'template for \'{page}\' particle is not found')
+				return
+
+
 		self.send_response(200)
-		self.send_header('Content-type','text/html')#'text/plain')
+		self.send_header('Content-type','text/html')
 		self.end_headers()
 
 		self.wfile.write('<link rel="stylesheet" href="style.css">'.encode('utf-8'))
 		self.wfile.write(nav(current_url).encode('utf-8'))
-
-		if page in cache:
-			particle = cache[page]
-		else:
-			with open(f'./particles/{page}.html') as p:
-				particle = p.read()
-				cache[page] = particle
 		self.wfile.write(particle.encode('utf-8'))
 
 		footer = cache['footer']
