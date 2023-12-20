@@ -1,2 +1,3 @@
 myenv
 *.swp
+__pycache__/

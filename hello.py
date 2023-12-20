@@ -1,6 +1,34 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler, SimpleHTTPRequestHandler
 from string import Template
 
+from jinja2 import Environment, PackageLoader, select_autoescape, TemplateNotFound
+
+env = Environment(
+    loader=PackageLoader('hello'),
+    autoescape=select_autoescape()
+)
+
+
+navlinks = (
+    {
+        'name': 'homepage',
+        'url': '/'
+    },
+    {
+        'name': 'about',
+        'url': '/about'
+    },
+    {
+        'name': 'contacts',
+        'url': '/contacts'
+    },
+    {
+        'name': 'no_template',
+        'url': '/no_template'
+    }
+)
+
+#print(template.render(navlinks=navlinks, current_page='contacts'))
 
 t = Template('Hello, $name')
 message = t.substitute(name='Ivan')
@@ -10,69 +38,48 @@ f = f'hello {name}'
 
 print('hello from python script')
 
-pages = ['', 'about', 'homepage', 'contacts', 'no_template']
 
-
-def nav(current_url):
-	parts = ['<nav><ul>']
-	for page in pages:
-		is_active = 'active' if page == current_url else ''
-		li = f'<li><a href="/{page}" class="{is_active}">{page}</a></li>'
-		parts.append(li)
-	parts.append('</ul></nav>')
-	html = ''.join(parts)
-	return html
-
-cache = {}
-
-with open(f'./particles/footer.html') as f:
-	cache['footer'] = f.read()
-
-class TemplateNotFoundError(FileNotFoundError):
-	pass
+# pages = ['homepage', 'about', 'contacts', 'no_template']
 
 class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
 
-	def do_GET(self):
-		print('path:', self.path)
-		current_url = self.path[1:]
-		# if True:
-		
-		if current_url not in pages:
-			super().do_GET()
-			return
+    def do_GET(self):
+        print('path:', self.path)
+        current_url = self.path
+        # if True:
 
-		if current_url == '':
-			page = 'homepage'
-		else:
-			page = current_url
+        # if current_url not in pages:
+        #if current_url.startswith('/assets'):
+        if self.path.startswith('/assets'):
+            super().do_GET()
+            return
 
-		if page in cache:
-			particle = cache[page]
-		else:
-			try:
-				with open(f'./particles/{page}.html') as p:
-					particle = p.read()
-					cache[page] = particle
-			except FileNotFoundError:
-				self.send_error(404, message='Template not found', explain=f'template for \'{page}\' particle is not found')
-				return
+        #if current_url == '':
+        #    curent_page = 'homepage'
+        #else:
+        #    curent_page = current_url
 
+        if current_url == '/':
+            template_name = 'index'
+        else:
+            template_name = current_url[1:] # remove slash from url start
 
-		self.send_response(200)
-		self.send_header('Content-type','text/html')
-		self.end_headers()
+        try:
+            template = env.get_template(f'{template_name}.html')
+        except TemplateNotFound:
+            self.send_error(404, message="Template not found")
+            return
 
-		self.wfile.write('<link rel="stylesheet" href="style.css">'.encode('utf-8'))
-		self.wfile.write(nav(current_url).encode('utf-8'))
-		self.wfile.write(particle.encode('utf-8'))
-
-		footer = cache['footer']
-		self.wfile.write(footer.encode('utf-8'))
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
 
 
-		self.wfile.write('wow'.encode('utf-8'))
-		return
+        self.wfile.write(template.render(navlinks=navlinks, current_url=current_url).encode('utf-8'))
+
+        self.wfile.write('wow'.encode('utf-8'))
+        return
+
 
 def run(server_class=HTTPServer, handler_class=ExtendedHTTPRequestHandler):
     server_address = ('', 8002)

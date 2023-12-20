@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% block head %}
+  <link rel="stylesheet" href="/assets/style.css"/>
+  <title>{% block title %}{% endblock %} - My Webpage</title>
+  {% endblock %}
+</head>
+<body>
+<link rel="stylesheet" href="/assets/style.css">
+<nav>
+  <ul>
+  {# #}
+    {% for n in navlinks %}
+    <li>
+      <a href="{{ n.url }}" class="{% if n.url == current_url %}active{% endif %}">
+        {{ n.name }}
+      </a>
+    </li>
+    {% endfor %}
+    {#
+     #}
+  </ul>
+</nav>
+<div id="content">{% block content %}{% endblock %}</div>
+
+{% include 'footer.html' %}
+
+</body>
+</html>
