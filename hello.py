@@ -74,7 +74,6 @@ class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
             try:
                 template = env.get_template(template_name)
             except TemplateNotFound:
-                self.send_header('Content-type', 'text/html')
                 self.send_error(404, message="Template not found")
                 return
 
@@ -120,7 +119,6 @@ class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
                     'current_year': date.today().strftime('%Y')
                 }
                 self.wfile.write(template.render(context=context).encode('utf-8'))
-
                 return
 
             # unknown page, show error
