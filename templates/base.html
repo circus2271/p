@@ -11,9 +11,9 @@
 <nav>
   <ul>
   {# #}
-    {% for n in navlinks %}
+    {% for n in context['navlinks'] %}
     <li>
-      <a href="{{ n.url }}" class="{% if n.url == current_url %}active{% endif %}">
+      <a href="{{ n.url }}" class="{% if n.url == context['current_url'] %}active{% endif %}">
         {{ n.name }}
       </a>
     </li>

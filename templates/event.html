@@ -7,11 +7,11 @@
     </style>
 {% endblock %}
 {% block content %}
-    <h1>{{event.id}} event</h1>
+    <h1>{{context['event'].id}} event</h1>
     <h2>Event detail page</h2>
 
-    <h2>{{event.title}}</h2>
-    <p>{{event.description}}</p>
-    <time>{{event.date}}</time>
+    <h2>{{context.event.title}}</h2>
+    <p>11{{context.event.description}}</p>
+    <time>{{context['event'].date}}</time>
 
 {% endblock %}

@@ -3,11 +3,24 @@ body {
   background: green;
 }
 
+nav ul {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  gap: 0.5rem;
+}
+
 a {
   color: #fff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 a.active {
+  text-decoration: underline;
   /*  color: green;*/
-  font-size: 2rem;
+/*  font-size: 2rem;*/
 }

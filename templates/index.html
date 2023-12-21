@@ -1,23 +1,27 @@
 {% extends "base.html" %}
 {% block title %}Index{% endblock %}
 {% block head %}
-    {{ super() }}
-    <style type="text/css">
-        .important { color: #336699; }
-    </style>
+  {{ super() }}
+  <style type="text/css">
+    .important {
+      color: #336699;
+    }
+  </style>
 {% endblock %}
 {% block content %}
-    <h1>Index</h1>
-    <h2>Events</h2>
+  <h1>Index</h1>
+  <h2>Events</h2>
 
-    <ul>
-    {% for event in events %}
-    <li>
-    <h2>{{event.title}}</h2>
-    <p>{{event.description}}</p>
-    <time>{{event.date}}</time>
-    </li>
+  <ul>
+    {% for event in context['events'] %}
+      <li>
+        <a href="/{{ event.id }}">
+          <h2>{{ event.title }}</h2>
+        </a>
+        <p>{{ event.description }}</p>
+        <time>{{ event.date }}</time>
+      </li>
     {% endfor %}
-    </ul>
+  </ul>
 
 {% endblock %}
