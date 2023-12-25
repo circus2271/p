@@ -1,4 +1,4 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler, SimpleHTTPRequestHandler
+from http.server import HTTPServer, CGIHTTPRequestHandler, BaseHTTPRequestHandler, SimpleHTTPRequestHandler
 from string import Template
 from datetime import date
 
@@ -55,7 +55,12 @@ events = [
     },
 ]
 
-class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
+class ExtendedHTTPRequestHandler(CGIHTTPRequestHandler):
+    # class ExtendedHTTPRequestHandler(SimpleHTTPRequestHandler):
+
+    def do_POST(self):
+        self.send_error(404)
+        return
 
     def do_GET(self):
         print('path:', self.path)

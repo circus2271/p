@@ -5,6 +5,38 @@
   <link rel="stylesheet" href="/assets/style.css"/>
   <title>{% block title %}{% endblock %} - My Webpage</title>
   {% endblock %}
+
+  <!-- theme toggle -->
+  <style>
+      html.dark-theme {
+      color-scheme: dark;
+    }
+
+    .theme-toggle {
+      cursor: pointer;
+    }
+  </style>
+  <script>
+    let theme = localStorage.getItem('theme')
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark-theme')
+    } 
+
+    window.addEventListener('DOMContentLoaded', _ => {
+      const themeToggle = document.querySelector('#theme-toggle')
+      themeToggle.addEventListener('click', e => {
+        if (theme === 'dark') {
+          theme = 'light'
+          localStorage.setItem('theme', theme)
+          document.documentElement.classList.remove('dark-theme')
+        } else if (!theme || theme === 'light') {
+          theme = 'dark'
+          localStorage.setItem('theme', theme)
+          document.documentElement.classList.add('dark-theme')
+        }
+      })
+    })
+  </script>
 </head>
 <body>
 <link rel="stylesheet" href="/assets/style.css">
@@ -21,6 +53,9 @@
     {#
      #}
   </ul>
+  <button class="theme-toggle" id="theme-toggle">
+    theme toggle
+  </button>
 </nav>
 <div id="content">{% block content %}{% endblock %}</div>
 
