@@ -1,6 +1,7 @@
 from http.server import HTTPServer, CGIHTTPRequestHandler, BaseHTTPRequestHandler, SimpleHTTPRequestHandler
 from string import Template
 from datetime import date
+import sqlite3
 
 from jinja2 import Environment, PackageLoader, select_autoescape, TemplateNotFound
 
@@ -31,6 +32,19 @@ navlinks = [
 
 predefined_links = [link['url'] for link in navlinks]
 
+
+con = sqlite3.connect('basic.db')
+cur = con.cursor()
+data_tuple = cur.execute('SELECT * FROM basic')
+events = []
+for item in data_tuple:
+	event = {}
+	event['title'] = item[0]
+	event['description'] = item[1]
+	event['date'] = item[2]
+	event['id'] = str(item[3])
+	events.append(event)
+
 t = Template('Hello, $name')
 message = t.substitute(name='Ivan')
 
@@ -40,7 +54,7 @@ f = f'hello {name}'
 print('hello from python script')
 
 
-events = [
+events_sample = [
     {
         'title': 'wow new event',
         'description': 'wow description',
@@ -103,11 +117,23 @@ class ExtendedHTTPRequestHandler(CGIHTTPRequestHandler):
             # find event by its id
             # if matches, show its detail page
             current_event = None
-            for event in events:
-                print('event id', str(event['id']))
-                if current_url[1:] == str(event['id']):
-                    current_event = event
-                    break
+            res = cur.execute(f'SELECT * FROM basic WHERE id="{current_url[1:]}"')
+            data = res.fetchone()
+            if data is not None:
+                current_event = {
+                  'title': data[0],
+                  'description': data[1],
+                  'date': data[2],
+		  'id': data[3]
+                }
+            if data is None:
+                self.send_error(404, message='no data found')
+                return 
+            #for event in events:
+            #    print('event id', str(event['id']))
+            #    if current_url[1:] == str(event['id']):
+            #        current_event = event
+            #        break
 
             if current_event:
                 print('curenene', current_event)
@@ -120,7 +146,7 @@ class ExtendedHTTPRequestHandler(CGIHTTPRequestHandler):
                 context = {
                     'navlinks': navlinks,
                     'current_url': current_url,
-                    'event': events[current_event['id'] - 1],
+                    'event': current_event,
                     'current_year': date.today().strftime('%Y')
                 }
                 self.wfile.write(template.render(context=context).encode('utf-8'))
