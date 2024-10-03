@@ -9,12 +9,25 @@ import sqlite3
 # 	event['id'] = str(item[3])
 # 	events.append(event)
 
+# this code uses _id for storing id
+# but in a template "id" is used (without an underscore)
+# so this code maps "_id" to "id" by using .get_dict() method
+# why? i don't know
+
+
 class Event:
-	def __init__(self, title, description, date, _id):
-		self.title = title
-		self.description = description
-		self.date = date
-		self._id = _id
+	def __init__(self, *args, **keywords):
+		dataSource = None
+		if len(args) == 4:
+			dataSource = args
+		elif 'dataArray' in keywords and len(keywords['dataArray']) == 4:
+			dataSource = keywords['dataArray']
+
+		self.title = dataSource[0]
+		self.description = dataSource[1]
+		self.date = dataSource[2]
+		self._id = dataSource[3]
+
 
 	def get_dict(self):
 		return {
@@ -51,14 +64,14 @@ class Mapper:
 		raw_events_data = res.fetchall()
 		events = []
 		for data in raw_events_data:
-			event = Event(data[0], data[1], data[2], data[3]).get_dict()
+			event = Event(dataArray=data).get_dict()
 			events.append(event)
 		return events
 
 	def get_event(self, id):
 		res = self.cur.execute('SELECT * FROM basic WHERE id = ?', (id, ))
 		raw_event_data = res.fetchone()
-		event = Event(raw_event_data[0], raw_event_data[1], raw_event_data[2], raw_event_data[3]).get_dict()
+		event = Event(dataArray=raw_event_data).get_dict()
 		return event
 
 mapper = Mapper()
