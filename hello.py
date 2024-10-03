@@ -5,6 +5,9 @@ import sqlite3
 
 from jinja2 import Environment, PackageLoader, select_autoescape, TemplateNotFound
 
+# local module import
+from orm import mapper
+
 env = Environment(
     loader=PackageLoader('hello'),
     autoescape=select_autoescape()
@@ -32,18 +35,8 @@ navlinks = [
 
 predefined_links = [link['url'] for link in navlinks]
 
+events = mapper.get_events()
 
-con = sqlite3.connect('basic.db')
-cur = con.cursor()
-data_tuple = cur.execute('SELECT * FROM basic')
-events = []
-for item in data_tuple:
-	event = {}
-	event['title'] = item[0]
-	event['description'] = item[1]
-	event['date'] = item[2]
-	event['id'] = str(item[3])
-	events.append(event)
 
 t = Template('Hello, $name')
 message = t.substitute(name='Ivan')
@@ -117,23 +110,13 @@ class ExtendedHTTPRequestHandler(CGIHTTPRequestHandler):
             # find event by its id
             # if matches, show its detail page
             current_event = None
-            res = cur.execute(f'SELECT * FROM basic WHERE id="{current_url[1:]}"')
-            data = res.fetchone()
-            if data is not None:
-                current_event = {
-                  'title': data[0],
-                  'description': data[1],
-                  'date': data[2],
-		  'id': data[3]
-                }
-            if data is None:
+
+            event_id = current_url[1:]
+            current_event = mapper.get_event(event_id)
+
+            if current_event is None:
                 self.send_error(404, message='no data found')
-                return 
-            #for event in events:
-            #    print('event id', str(event['id']))
-            #    if current_url[1:] == str(event['id']):
-            #        current_event = event
-            #        break
+                return
 
             if current_event:
                 print('curenene', current_event)
@@ -158,7 +141,7 @@ class ExtendedHTTPRequestHandler(CGIHTTPRequestHandler):
 
 
 def run(server_class=HTTPServer, handler_class=ExtendedHTTPRequestHandler):
-    server_address = ('', 8002)
+    server_address = ('', 8000)
     httpd = server_class(server_address, handler_class)
     httpd.serve_forever()
 

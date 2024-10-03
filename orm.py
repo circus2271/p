@@ -48,12 +48,17 @@ class Mapper:
 
 	def get_events(self):
 		res = self.cur.execute('SELECT * FROM basic')
-		events = res.fetchall()
+		raw_events_data = res.fetchall()
+		events = []
+		for data in raw_events_data:
+			event = Event(data[0], data[1], data[2], data[3])
+			events.append(event)
 		return events
 
 	def get_event(self, id):
 		res = self.cur.execute('SELECT * FROM basic WHERE id = ?', (id, ))
-		event = res.fetchone()
+		raw_event_data = res.fetchone()
+		event = Event(raw_event_data[0], raw_event_data[1], raw_event_data[2], raw_event_data[3])
 		return event	
 
 mapper = Mapper()
