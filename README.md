@@ -2,7 +2,7 @@
 ```
 cd ./p
 
-python3 -m venv myenv
+python3 -m venv myvenv
 ```
 активировать это окружение:
 `source myvenv/bin/activate`

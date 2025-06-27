@@ -9,13 +9,15 @@ import sqlite3
 # 	event['id'] = str(item[3])
 # 	events.append(event)
 
-# this code uses _id for storing id
-# but in a template "id" is used (without an underscore)
-# so this code maps "_id" to "id" by using .get_dict() method
-# why? i don't know
-
 
 class Event:
+	"""
+	You can instantiate an event with:
+		4 parameters (title, discription, date, id)
+		1 array with those parameters
+		a keyword pointing on array with those paramenters (dataArray=['lorem', 'ipsum', 'lit', 1])
+	"""
+
 	def __init__(self, *args, **keywords):
 		dataSource = None
 		if len(args) == 4:
@@ -26,7 +28,7 @@ class Event:
 		self.title = dataSource[0]
 		self.description = dataSource[1]
 		self.date = dataSource[2]
-		self._id = dataSource[3]
+		self.id = dataSource[3]
 
 
 	def get_dict(self):
@@ -34,11 +36,11 @@ class Event:
 			'title': self.title,
 			'description': self.description,
 			'date': self.date,
-			'id': self._id,
+			'id': self.id,
 		}
 
 	def get_tuple(self):
-		return (self.title, self.description, self.date, self._id)
+		return (self.title, self.description, self.date, self.id)
 
 
 
@@ -49,10 +51,9 @@ class Mapper:
 		# self.events = []
 		# self.table_name = 'basic'
 
-	def create_event(self, title, description, date, id):
+	def create_event(self, event):
 		# try:
 		# validate
-		event = Event(title, description, date, id)
 		self.cur.execute('INSERT INTO basic VALUES(?, ?, ?, ?)', event.get_tuple())
 		# close transaction, and probably save the data to a database
 		self.con.commit()
